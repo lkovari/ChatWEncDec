@@ -13,6 +13,7 @@ import { AppComponent } from './app.component';
     ReactiveFormsModule
   ],
   providers: [],
+  exports: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

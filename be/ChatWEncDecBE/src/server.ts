@@ -54,7 +54,7 @@ wss.on('connection', (ws: WebSocket) => {
 
             }
 
-            ws.send(createMessage(`You sent : ${message.content}`, message.isBroadcast));
+            // ws.send(createMessage(`${message.content}`, message.isBroadcast));
 
         }, 1000);
 

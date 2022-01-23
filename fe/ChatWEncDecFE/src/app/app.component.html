@@ -6,10 +6,9 @@
         <label class="gap-right" for="userName">User name
           <span class="mandatory-asterisk">*</span>
         </label>
-        <input class="gap-right" type="text" pInputText id="userName" formControlName="userName"/>
+        <input class="gap-right" type="text" id="userName" formControlName="userName" (blur)="onBlurUserName($event)"/>
       </div>
       <label class="gap-right" *ngIf="dataEntryForm.get('userName')?.value">User: {{ dataEntryForm.get('userName')?.value }}</label>
-      <button type="button" class="button-style" [disabled]="webSocket$ !== undefined" (click)="onConnect($event)">{{ connectetButtonTitle }}</button>
     </div>
     <div class="content">
       <label class="gap-right" for="message">Messages</label>
@@ -24,7 +23,7 @@
     <div class="footer">
       <div class="mess-in">
         <label class="gap-right" for="message">Message:</label>
-        <input type="text" pInputText id="message" class="mess-style" formControlName="message"/>
+        <input type="text" id="message" class="mess-style" formControlName="message"/>
         <button type="button" class="align-right" (click)="onSendMessage($event)">Send</button>
       </div>
     </div>

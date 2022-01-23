@@ -16,9 +16,10 @@ export class Message implements IMessage {
         this.content = JSON.stringify(v);
     }
 
-    constructor(sender: string, customMessage: CustomMessage, isBroadcast: boolean) {
+    constructor(sender: string, /*customMessage: CustomMessage*/content: string, isBroadcast: boolean) {
         this.sender = sender;
-        this.content = JSON.stringify(customMessage);
+        // this.content = JSON.stringify(customMessage);
+        this.content = content;
         this.isBroadcast = isBroadcast;
     };
 }
