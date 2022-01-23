@@ -9,6 +9,11 @@
         <input class="gap-right" type="text" id="userName" formControlName="userName" (blur)="onBlurUserName($event)"/>
       </div>
       <label class="gap-right" *ngIf="dataEntryForm.get('userName')?.value">User: {{ dataEntryForm.get('userName')?.value }}</label>
+      <!-- just for demonstration purposes -->
+      <div class="dk-input-style">
+        <label class="gap-right">Decrypt key:</label>
+        <input type="text" id="decryptKey" class="input-style" formControlName="decryptKey"/>
+      </div>
     </div>
     <div class="content">
       <label class="gap-right" for="message">Messages</label>
