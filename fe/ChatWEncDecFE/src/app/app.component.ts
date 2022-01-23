@@ -50,9 +50,14 @@ export class AppComponent implements OnInit  {
       );
       this.webSocket$.subscribe((message: Message) => {
           if (message.content !== this.MSG_CONNECTION_MESSAGE) {
-            const decrypted = this.encDecService.decrypt(message.content, this.secretKey);
-            message.content = decrypted;
-            this.sentMessages.push(message);
+            const messageObject = JSON.parse(message.content);
+            
+            const digest = this.encDecService.createHMACSHA1Digest(messageObject.textMessage, this.secretKey);            
+            if (digest === messageObject.hmacsha1) {
+              const decrypted = this.encDecService.decrypt(messageObject.textMessage, this.secretKey);
+              message.content = decrypted;
+              this.sentMessages.push(message);
+            }
           } else {
             this.sentMessages.push(message);
           }
@@ -74,6 +79,7 @@ export class AppComponent implements OnInit  {
     // return strKey;
     return 'Mjc4ODAxNDAxOTcyMTkxNy41';
   }
+
   extractMessage(message: Message): string {
     return message.sender + ' : ' + message.content;
   }
@@ -87,9 +93,13 @@ export class AppComponent implements OnInit  {
     let textMessage = this.dataEntryForm.get('message')?.value;
 
     const encryptedText = this.encDecService.encrypt(textMessage, this.secretKey);
-    // const customMessage = new CustomMessage(textMessage, null);    
+    const digest = this.encDecService.createHMACSHA1Digest(encryptedText, this.secretKey);
+    
+    const customMessage = new CustomMessage(encryptedText, digest);    
+    const messageObject = JSON.stringify(customMessage);
+
     const messageTOMine = new Message(this.currentUserName, textMessage, true);
-    const message = new Message(this.currentUserName, encryptedText, true);
+    const message = new Message(this.currentUserName, messageObject, true);
 
     this.sentMessages.push(messageTOMine);
     this.webSocket$.next(message);
