@@ -54,14 +54,14 @@ wss.on('connection', (ws: WebSocket) => {
 
             }
 
-            ws.send(createMessage(`Sent -> ${message.content}`, message.isBroadcast));
+            ws.send(createMessage(`You sent : ${message.content}`, message.isBroadcast));
 
         }, 1000);
 
     });
 
     // Send immediatly a feedback to the incoming connection    
-    ws.send(createMessage('WebSocket server'));
+    ws.send(createMessage('Connected'));
 
     ws.on('error', (err) => {
         console.warn(`Client Disconnected - reason: ${err}`);
@@ -81,6 +81,6 @@ setInterval(() => {
 }, 10000);
 
 // Server start
-server.listen(process.env.PORT || 8999, () => {
+server.listen(process.env.PORT || 7777, () => {
     console.log(`WebSocket server started on port ${server.address().port} :)`);
 });
