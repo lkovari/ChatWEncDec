@@ -10,11 +10,11 @@ const server = http.createServer(app);
 // Initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });
 
-interface ExtWebSocket extends WebSocket {
+interface CustomWebSocket extends WebSocket {
     isAlive: boolean;
 }
 
-function createMessage(content: string, isBroadcast = false, sender = 'NS'): string {
+function createMessage(content: string, isBroadcast = false, sender = 'WS'): string {
     return JSON.stringify(new Message(content, isBroadcast, sender));
 }
 
@@ -27,13 +27,12 @@ export class Message {
 }
 
 wss.on('connection', (ws: WebSocket) => {
+    const customtWs = ws as CustomWebSocket;
+    customtWs.isAlive = true;
 
-    const extWs = ws as ExtWebSocket;
-
-    extWs.isAlive = true;
-
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers#pings_and_pongs_the_heartbeat_of_websockets
     ws.on('pong', () => {
-        extWs.isAlive = true;
+        customtWs.isAlive = true;
     });
 
     // Connection is up, let's add a simple simple event
@@ -45,22 +44,17 @@ wss.on('connection', (ws: WebSocket) => {
             if (message.isBroadcast) {
 
                 // Send back the message to the other clients
-                wss.clients
-                    .forEach(client => {
+                wss.clients.forEach(client => {
                         if (client != ws) {
                             client.send(createMessage(message.content, true, message.sender));
                         }
                     });
-
             }
-
-            // ws.send(createMessage(`${message.content}`, message.isBroadcast));
-
         }, 1000);
 
     });
 
-    // Send immediatly a feedback to the incoming connection    
+    // Send a feedback immediatly to the incoming connection    
     ws.send(createMessage('Connected'));
 
     ws.on('error', (err) => {
@@ -70,12 +64,11 @@ wss.on('connection', (ws: WebSocket) => {
 
 setInterval(() => {
     wss.clients.forEach((ws: WebSocket) => {
-
-        const extWs = ws as ExtWebSocket;
-
-        if (!extWs.isAlive) return ws.terminate();
-
-        extWs.isAlive = false;
+        const customtWs = ws as CustomWebSocket;
+        if (!customtWs.isAlive) {
+            return ws.terminate();
+        }
+        customtWs.isAlive = false;
         ws.ping(null, undefined);
     });
 }, 10000);

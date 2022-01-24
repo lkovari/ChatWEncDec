@@ -2,17 +2,15 @@
   <h1>{{ title }}</h1>
   <form [formGroup]="dataEntryForm" novalidate autocomplete="off">
     <div class="header">
-      <div *ngIf="!dataEntryForm.get('userName')?.value">
+      <div>
         <label class="gap-right" for="userName">User name
           <span class="mandatory-asterisk">*</span>
         </label>
         <input class="gap-right" type="text" id="userName" formControlName="userName" (blur)="onBlurUserName($event)"/>
-      </div>
-      <label class="gap-right" *ngIf="dataEntryForm.get('userName')?.value">User: {{ dataEntryForm.get('userName')?.value }}</label>
-      <!-- just for demonstration purposes -->
-      <div class="dk-input-style">
+        <!-- just for demonstration purposes BEGIN -->
         <label class="gap-right">Decrypt key:</label>
-        <input type="text" id="decryptKey" class="input-style" formControlName="decryptKey"/>
+        <input type="text" id="decryptKey"  formControlName="decryptKey"/>        
+        <!-- just for demonstration purposes END -->
       </div>
     </div>
     <div class="content">
