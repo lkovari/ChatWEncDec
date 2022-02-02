@@ -4,6 +4,7 @@ import { Message } from './models/message.model';
 import { WebSocketSubject } from 'rxjs/webSocket';
 import { CustomMessage } from './models/custom-message.model';
 import { EncrptDecryptService } from './services/encdec/encrpt-decrypt.service';
+import { EncryptedWrapper } from './models/encripted-wrapper.model';
 
 @Component({
   selector: 'app-root',
@@ -61,7 +62,7 @@ export class AppComponent implements OnInit {
         // skip Connected notification
         if (message.content !== this.MSG_CONNECTION_MESSAGE) {
           // parse message text to object
-          const messageObject = JSON.parse(message.content);
+          const messageObject = <CustomMessage>JSON.parse(message.content);
           // is the decrypt key entered?
           if (decryptKey) {
             // create digest from received textMessage
@@ -69,7 +70,7 @@ export class AppComponent implements OnInit {
             // compare the digests
             if (digest === messageObject.hmacsha1) {
               // decrypt the message
-              const decrypted = this.encDecService.decrypt(messageObject.textMessage, decryptKey);
+              const decrypted = this.encDecService.decrypt(messageObject.textMessage, decryptKey, messageObject.iv);
               // store message to the message object 
               message.content = decrypted;
               // push message to sentMessages (which will display)
@@ -137,10 +138,10 @@ export class AppComponent implements OnInit {
     this.currentUserName = this.dataEntryForm.get('userName')?.value;
     let textMessage = this.dataEntryForm.get('message')?.value;
 
-    const encryptedText = this.encDecService.encrypt(textMessage, this.encryptKey);
-    const digest = this.encDecService.createHMACSHA1Digest(encryptedText, this.encryptKey);
+    const encryptedWrapper = this.encDecService.encrypt(textMessage, this.encryptKey);
+    const digest = this.encDecService.createHMACSHA1Digest(encryptedWrapper.encrypted, this.encryptKey);
 
-    const customMessage = new CustomMessage(encryptedText, digest);
+    const customMessage = new CustomMessage(encryptedWrapper.encrypted, digest, encryptedWrapper.iv);
     const messageObject = JSON.stringify(customMessage);
 
     const messageTOMine = new Message(this.currentUserName, textMessage, true);

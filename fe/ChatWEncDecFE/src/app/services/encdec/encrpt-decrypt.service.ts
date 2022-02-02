@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import * as CryptoJS from 'crypto-js';  
+import { EncryptedWrapper } from 'src/app/models/encripted-wrapper.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EncrptDecryptService {
-
+  private  SOURCE_OF_IV = "This phrase is the source of the initialization vector for CFB encrypt mode, just for demonstration purposes!";
   constructor() { }
 
   /**
@@ -29,25 +30,27 @@ export class EncrptDecryptService {
    * 
    * @param plain: string - the plain text 
    * @param key: string - the passphrase 
-   * @returns: any - encrypted text/cipher text 
+   * @returns: EncryptedWrapper, contains the encrypted text/cipher text and the initialization vector
    */
-  encrypt(plain: string, key: string): any {
+  encrypt(plain: string, key: string): EncryptedWrapper {
     const _key = CryptoJS.enc.Utf8.parse(key);
-    const _iv = CryptoJS.enc.Utf8.parse(key);
+    // _iv = CryptoJS.enc.Utf8.parse(key);
+    const _iv = this.generate256bitKey(this.SOURCE_OF_IV);
     const options = { keySize: 16, iv: _iv, mode: CryptoJS.mode.CFB, padding: CryptoJS.pad.NoPadding };
     const encrypted = CryptoJS.AES.encrypt(JSON.stringify(plain), _key, options);
-    return encrypted.toString();
+    return new EncryptedWrapper(encrypted.toString(), _iv);
   }
 
   /**
    * 
-   * @param encrypted: string - cipher text 
-   * @param key: passphrase 
-   * @returns: string - plain text 
+   * @param encrypted : string - cipher text 
+   * @param key : passphrase 
+   * @param iv : CryptoJS.lib.WordArray - initialization vector
+   * @returns string - plain text 
    */
-  decrypt(encrypted: any, key: string): string {
+  decrypt(encrypted: any, key: string, iv: CryptoJS.lib.WordArray): string {
     let _key = CryptoJS.enc.Utf8.parse(key);
-    let _iv = CryptoJS.enc.Utf8.parse(key);
+    let _iv = iv;
     const options = { keySize: 16, iv: _iv, mode: CryptoJS.mode.CFB, padding: CryptoJS.pad.NoPadding };
     return CryptoJS.AES.decrypt(encrypted, _key, options).toString(CryptoJS.enc.Utf8);    
   }
